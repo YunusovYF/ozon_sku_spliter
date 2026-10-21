@@ -38,6 +38,12 @@ describe('extractSku', () => {
   it('accepts bare id path', () => {
     expect(extractSku('/product/2043441656/')).toBe('2043441656');
   });
+  it('rejects javascript: url with embedded product path', () => {
+    expect(extractSku('javascript:alert(1)//www.ozon.ru/product/123/')).toBeNull();
+  });
+  it('rejects foreign host', () => {
+    expect(extractSku('https://evil.example/product/123/')).toBeNull();
+  });
   it('rejects non-product url', () => {
     expect(extractSku('/category/foo-15906/')).toBeNull();
   });

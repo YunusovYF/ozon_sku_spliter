@@ -17,8 +17,8 @@ export function formatLabel(variant: number, group: number): string {
   return `${formatCount(variant)} из ${formatCount(group)}`;
 }
 
-/** SKU — последнее число в сегменте после /product/. */
+/** SKU — последнее число в сегменте после /product/. Только относительные ссылки или www.ozon.ru. */
 export function extractSku(href: string): string | null {
-  const m = href.match(/\/product\/(?:[^/?#]*?-)?(\d+)\/?(?:[?#]|$)/);
+  const m = href.match(/^(?:https:\/\/www\.ozon\.ru)?\/product\/(?:[^/?#]*?-)?(\d+)\/?(?:[?#]|$)/);
   return m ? m[1] : null;
 }

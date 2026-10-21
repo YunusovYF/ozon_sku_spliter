@@ -42,7 +42,8 @@ export function findCards(root: ParentNode): CardInfo[] {
     const title = links
       .map((a) => (a.textContent ?? '').trim())
       .reduce((a, b) => (b.length > a.length ? b : a), '');
-    cards.push({ el, sku, href, title, reviewsEl: reviews.el, group: reviews.group });
+    // Ссылку собираем из SKU, а не копируем со страницы.
+    cards.push({ el, sku, href: `https://www.ozon.ru/product/${sku}/`, title, reviewsEl: reviews.el, group: reviews.group });
   }
   return cards;
 }

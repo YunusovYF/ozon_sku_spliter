@@ -112,4 +112,11 @@ describe('content script', () => {
     }
     expect(span.textContent).toBe('230 из 16 873');
   });
+  it('panel links are rebuilt from sku, not copied from the page', async () => {
+    const f = jsonFetch();
+    const { panel } = run({ root: document, kv: memoryKV(), fetchFn: f as unknown as typeof fetch });
+    await vi.advanceTimersByTimeAsync(5000);
+    const hrefs = [...panel.root.querySelectorAll('a')].map((a) => a.getAttribute('href'));
+    expect(hrefs).toContain('https://www.ozon.ru/product/2043441656/');
+  });
 });

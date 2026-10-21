@@ -36,7 +36,7 @@ describe('fetchVariantReviews', () => {
     const f = mockFetch(200, 'application/json', JSON.stringify(variantFixture));
     await fetchVariantReviews('2043441656', f as unknown as typeof fetch);
     expect(f.mock.calls[0][0]).toBe(
-      '/api/entrypoint-api.bx/page/json/v2?url=%2Fproduct%2F2043441656%2Freviews%2Fpdp-part',
+      'https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=%2Fproduct%2F2043441656%2Freviews%2Fpdp-part',
     );
   });
   it('treats html 200 (antibot page) as blocked', async () => {

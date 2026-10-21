@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Реальные отзывы SKU для Ozon",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Показывает на карточках Ozon реальное число отзывов конкретного варианта товара, а не всей группы.",
   "permissions": ["storage"],
   "host_permissions": ["https://www.ozon.ru/*"],

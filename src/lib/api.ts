@@ -49,7 +49,7 @@ export async function fetchVariantReviews(
   fetchFn: typeof fetch = fetch,
 ): Promise<ReviewsResult> {
   const url =
-    '/api/entrypoint-api.bx/page/json/v2?url=' + encodeURIComponent(`/product/${sku}/reviews/pdp-part`);
+    'https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=' + encodeURIComponent(`/product/${sku}/reviews/pdp-part`);
   const res = await fetchFn(url, { credentials: 'include' });
   if (res.status === 403 || res.status === 429) throw new BlockedError(`HTTP ${res.status}`);
   if (!res.ok) throw new Error(`HTTP ${res.status} for sku ${sku}`);
