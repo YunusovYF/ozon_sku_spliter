@@ -90,4 +90,31 @@ describe('RequestQueue', () => {
     await vi.advanceTimersByTimeAsync(400);
     expect(d.started).toEqual(['a', 'b']);
   });
+  it('reports idle when nothing is pending or running', async () => {
+    const d = deferredWorker();
+    const q = new RequestQueue(d.worker, { concurrency: 1, delayMs: 10 });
+    expect(q.idle).toBe(true);
+    q.add('a');
+    expect(q.idle).toBe(false);
+    await vi.advanceTimersByTimeAsync(10);
+    d.pending.get('a')!.resolve();
+    await vi.advanceTimersByTimeAsync(10);
+    expect(q.idle).toBe(true);
+  });
+  it('calls onIdle once the last job settles', async () => {
+    const d = deferredWorker();
+    const q = new RequestQueue(d.worker, { concurrency: 1, delayMs: 10 });
+    const seen: boolean[] = [];
+    q.onIdle = () => seen.push(q.idle);
+    q.add('a');
+    q.add('b');
+    await vi.advanceTimersByTimeAsync(10);
+    d.pending.get('a')!.resolve();
+    await vi.advanceTimersByTimeAsync(10);
+    expect(seen).toEqual([]);
+    d.pending.get('b')!.reject(new Error('x'));
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await vi.advanceTimersByTimeAsync(10);
+    expect(seen).toEqual([true]);
+  });
 });

@@ -22,3 +22,19 @@ export function extractSku(href: string): string | null {
   const m = href.match(/^(?:https:\/\/www\.ozon\.ru)?\/product\/(?:[^/?#]*?-)?(\d+)\/?(?:[?#]|$)/);
   return m ? m[1] : null;
 }
+
+/** «отзыв / отзыва / отзывов» по числу. */
+export function reviewsWord(n: number): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return 'отзыв';
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'отзыва';
+  return 'отзывов';
+}
+
+/** Подпись отзывов на нашей карточке: «315 из 16 873» или «21 отзыв». */
+export function reviewsLabel(variant: number | null, group: number | null): string {
+  if (variant !== null) return formatLabel(variant, group ?? variant);
+  if (group !== null) return `${formatCount(group)} ${reviewsWord(group)}`;
+  return 'нет данных';
+}

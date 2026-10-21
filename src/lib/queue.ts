@@ -8,6 +8,8 @@ export interface QueueOptions {
 /** Очередь запросов: без дублей, с приоритетом, ограничением параллельности и паузой между стартами. */
 export class RequestQueue {
   onBlocked?: () => void;
+  /** Очередь опустела: последний запрос завершён и ждать больше нечего. */
+  onIdle?: () => void;
   private pending: string[] = [];
   private seen = new Set<string>();
   private running = 0;
@@ -27,6 +29,11 @@ export class RequestQueue {
 
   get stopped(): boolean {
     return this._stopped;
+  }
+
+  /** Нет ни ожидающих, ни выполняющихся запросов. */
+  get idle(): boolean {
+    return this.running === 0 && this.pending.length === 0;
   }
 
   add(sku: string): void {
@@ -78,6 +85,7 @@ export class RequestQueue {
       .finally(() => {
         this.running--;
         this.pump();
+        if (this.idle) this.onIdle?.();
       });
     this.pump();
   }

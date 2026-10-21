@@ -44,15 +44,19 @@ export function parseVariantResponse(json: unknown): ReviewsResult {
   return { kind: 'single', group };
 }
 
+/** GET внутреннего API страниц Ozon с проверкой на блокировку. */
+export async function fetchEntrypoint(path: string, fetchFn: typeof fetch = fetch): Promise<unknown> {
+  const url = 'https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=' + encodeURIComponent(path);
+  const res = await fetchFn(url, { credentials: 'include' });
+  if (res.status === 403 || res.status === 429) throw new BlockedError(`HTTP ${res.status}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${path}`);
+  if (!(res.headers.get('content-type') ?? '').includes('json')) throw new BlockedError('non-JSON response');
+  return res.json();
+}
+
 export async function fetchVariantReviews(
   sku: string,
   fetchFn: typeof fetch = fetch,
 ): Promise<ReviewsResult> {
-  const url =
-    'https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=' + encodeURIComponent(`/product/${sku}/reviews/pdp-part`);
-  const res = await fetchFn(url, { credentials: 'include' });
-  if (res.status === 403 || res.status === 429) throw new BlockedError(`HTTP ${res.status}`);
-  if (!res.ok) throw new Error(`HTTP ${res.status} for sku ${sku}`);
-  if (!(res.headers.get('content-type') ?? '').includes('json')) throw new BlockedError('non-JSON response');
-  return parseVariantResponse(await res.json());
+  return parseVariantResponse(await fetchEntrypoint(`/product/${sku}/reviews/pdp-part`, fetchFn));
 }

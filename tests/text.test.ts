@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { extractSku, formatCount, formatLabel, parseCount } from '../src/lib/text';
+import { extractSku, formatCount, formatLabel, parseCount, reviewsWord } from '../src/lib/text';
 
 describe('parseCount', () => {
   it('parses count with thin space and word', () => {
@@ -46,5 +46,13 @@ describe('extractSku', () => {
   });
   it('rejects non-product url', () => {
     expect(extractSku('/category/foo-15906/')).toBeNull();
+  });
+});
+
+describe('reviewsWord', () => {
+  it('declines the word', () => {
+    expect([1, 2, 5, 11, 21, 22, 25, 111, 1001].map(reviewsWord)).toEqual([
+      'отзыв', 'отзыва', 'отзывов', 'отзывов', 'отзыв', 'отзыва', 'отзывов', 'отзывов', 'отзыв',
+    ]);
   });
 });

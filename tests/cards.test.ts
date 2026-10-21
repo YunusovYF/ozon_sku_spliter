@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { applyLabel, findCards, isLabelStale } from '../src/lib/cards';
+import { applyLabel, findCards, isLabelStale, removeLabel } from '../src/lib/cards';
 
 import html from './fixtures/grid.html?raw';
 
@@ -49,5 +49,13 @@ describe('applyLabel', () => {
     card.reviewsEl.textContent = '523 отзыва';
     const [again] = findCards(document);
     expect(again.group).toBe(523);
+  });
+  it('removeLabel restores original text and drops our attributes', () => {
+    const [card] = findCards(document);
+    applyLabel(card, 315);
+    removeLabel(card);
+    expect(card.reviewsEl.textContent).toBe('16 873 отзыва');
+    expect([...card.reviewsEl.attributes].some((a) => a.name.startsWith('data-ozon-sku'))).toBe(false);
+    expect(findCards(document)[0].group).toBe(16873);
   });
 });

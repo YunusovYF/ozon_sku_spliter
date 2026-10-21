@@ -11,6 +11,7 @@ export interface CardInfo {
 
 const LABEL_ATTR = 'data-ozon-sku-label';
 const GROUP_ATTR = 'data-ozon-sku-group';
+const ORIG_ATTR = 'data-ozon-sku-orig';
 const RATING_RE = /^\d[.,]\d$/;
 
 /** Ищет span с числом отзывов рядом со span рейтинга («4.9»). Классы Ozon обфусцированы — опираемся на текст. */
@@ -50,9 +51,19 @@ export function findCards(root: ParentNode): CardInfo[] {
 
 export function applyLabel(card: CardInfo, variant: number): void {
   const label = formatLabel(variant, card.group);
+  const text = card.reviewsEl.textContent ?? '';
+  if (!card.reviewsEl.hasAttribute(ORIG_ATTR) || parseCount(text) !== null) card.reviewsEl.setAttribute(ORIG_ATTR, text);
   card.reviewsEl.setAttribute(GROUP_ATTR, String(card.group));
   card.reviewsEl.setAttribute(LABEL_ATTR, label);
   if (card.reviewsEl.textContent !== label) card.reviewsEl.textContent = label;
+}
+
+/** Возвращает исходный текст Ozon и снимает наши атрибуты. */
+export function removeLabel(card: CardInfo): void {
+  const el = card.reviewsEl;
+  const orig = el.getAttribute(ORIG_ATTR);
+  if (orig !== null && el.textContent === el.getAttribute(LABEL_ATTR)) el.textContent = orig;
+  for (const a of [ORIG_ATTR, LABEL_ATTR, GROUP_ATTR]) el.removeAttribute(a);
 }
 
 /** true, если React Ozon перерисовал карточку и вернул исходный текст. */
